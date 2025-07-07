@@ -63,8 +63,9 @@ contract CRID {
     mapping(address => bool) public coordenadores;
     mapping(address => bool) public orientadores;
     mapping(string => uint256[]) public pedidosPorDisciplina;
-    mapping(address => uint256[]) public pedidosPorEstudante;
-    
+    mapping(address => uint256[]) public pedidosPorEstudante;    
+    mapping(address => mapping(string => bool)) public pedidoExistente; // Adicionar mapeamento para controlar pedidos duplicados
+
     // Arrays para controle
     string[] public codigosDisciplinas;
     
@@ -199,6 +200,7 @@ contract CRID {
      */
     function realizarPedido(string memory _codigoDisciplina) external apenasEstudanteAtivo {
         require(disciplinas[_codigoDisciplina].ativa, "Disciplina nao encontrada ou inativa");
+        require(!pedidoExistente[msg.sender][_codigoDisciplina], "Pedido ja existe para esta disciplina");
         
         Estudante memory estudante = estudantes[msg.sender];
         
@@ -218,6 +220,8 @@ contract CRID {
         
         pedidosPorDisciplina[_codigoDisciplina].push(idPedido);
         pedidosPorEstudante[msg.sender].push(idPedido);
+        
+        pedidoExistente[msg.sender][_codigoDisciplina] = true;
         
         emit PedidoRealizado(idPedido, msg.sender, _codigoDisciplina);
     }
@@ -251,6 +255,9 @@ contract CRID {
         if (_novoStatus == StatusPedido.Efetivado) {
             require(disciplina.vagasOcupadas < disciplina.vagas, "Nao ha vagas disponiveis");
             disciplina.vagasOcupadas++;
+        } else if (_novoStatus == StatusPedido.Trancado && pedido.status == StatusPedido.Efetivado) {
+            // Liberar vaga quando trancar
+            disciplina.vagasOcupadas--;
         }
         
         pedido.status = _novoStatus;
@@ -366,28 +373,24 @@ contract CRID {
      * @return Array com IDs dos pedidos no CRID
      */
     function getCRIDEstudante(address _estudante) external view returns (uint256[] memory) {
-        uint256[] memory todosPedidos = pedidosPorEstudante[_estudante];
+        uint256[] storage todosPedidos = pedidosPorEstudante[_estudante];
+        uint256 length = todosPedidos.length;
+        uint256[] memory pedidosCRID = new uint256[](length);
         uint256 count = 0;
         
-        // Conta quantos pedidos estão no CRID
-        for (uint256 i = 0; i < todosPedidos.length; i++) {
+        for (uint256 i = 0; i < length; i++) {
             StatusPedido status = pedidos[todosPedidos[i]].status;
             if (status == StatusPedido.Efetivado || status == StatusPedido.Trancado) {
+                pedidosCRID[count] = todosPedidos[i];
                 count++;
             }
         }
         
-        // Cria array com apenas os pedidos do CRID
-        uint256[] memory pedidosCRID = new uint256[](count);
-        uint256 index = 0;
+        // Redimensionar array para o tamanho correto
+        assembly {
+            mstore(pedidosCRID, count)
+        }
         
-        for (uint256 i = 0; i < todosPedidos.length; i++) {
-            StatusPedido status = pedidos[todosPedidos[i]].status;
-            if (status == StatusPedido.Efetivado || status == StatusPedido.Trancado) {
-                pedidosCRID[index] = todosPedidos[i];
-                index++;
-            }
-        }        
         return pedidosCRID;
     }
 }
