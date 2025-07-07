@@ -65,23 +65,39 @@ struct PedidoInscricao {
 }
 ```
 
+### Fluxo do Sistema
+
+1. **Cadastro**: Admin cadastra estudantes, coordenadores, orientadores e disciplinas
+2. **Solicitação**: Estudante realiza pedido de inscrição
+3. **Concordância**: Orientador dá concordância ao pedido
+4. **Processamento**: Coordenador aprova, rejeita ou tranca o pedido
+5. **Trancamento**: Estudante pode solicitar trancamento de disciplina efetivada
+
 ## Tecnologias Utilizadas
-- Solidity: Linguagem de programação para smart contracts
-- Ethereum: Blockchain para execução do contrato
-- Remix IDE: Ambiente de desenvolvimento
 
-## Deploy  via Remix IDE
+- **Solidity**: Linguagem de programação para smart contracts
+- **Ethereum**: Blockchain para execução do contrato
+- **Remix IDE**: Ambiente de desenvolvimento
 
-1. Acesse Remix IDE
-2. Crie um novo arquivo .sol e cole o código do contrato
+## Requisitos
+
+- Solidity `>=0.7.0 <0.9.0`
+- Ambiente Ethereum (local ou testnet)
+- Carteira Ethereum (MetaMask recomendado)
+
+## Deploy via Remix IDE
+
+1. Acesse [Remix IDE](https://remix.ethereum.org/)
+2. Crie um novo arquivo `.sol` e cole o código do contrato
 3. Compile o contrato (Solidity 0.8.x)
 4. Conecte sua carteira Ethereum
 5. Deploy na rede desejada
 
 ## Como Usar
 
-1. Configuração Inicial (Admin)
-```
+### 1. Configuração Inicial (Admin)
+
+```solidity
 // Adicionar coordenadores
 contract.adicionarCoordenador("0x...");
 
@@ -110,8 +126,9 @@ contract.cadastrarDisciplina(
 );
 ```
 
-2. Fluxo do Estudante
-```
+### 2. Fluxo do Estudante
+
+```solidity
 // Realizar pedido
 contract.realizarPedido("EEL740");
 
@@ -122,26 +139,66 @@ contract.solicitarTrancamento(1);
 contract.getCRIDEstudante("0x...");
 ```
 
-3. Fluxo do Orientador
-```
+### 3. Fluxo do Orientador
+
+```solidity
 // Dar concordância
 contract.darConcordancia(1);
 ```
 
-4. Fluxo do Coordenador
-```
+### 4. Fluxo do Coordenador
+
+```solidity
 // Processar pedido
 contract.processarPedido(1, StatusPedido.Efetivado);
 ```
 
 ## Eventos do Sistema
 
-- event EstudanteCadastrado(address indexed estudante, string matricula, string nome);
-- event DisciplinaCadastrada(string indexed codigo, string nome, address coordenador);
-- event PedidoRealizado(uint256 indexed idPedido, address indexed estudante, string codigoDisciplina);
-- event PedidoAtualizado(uint256 indexed idPedido, StatusPedido novoStatus);
-- event CoordenadorAdicionado(address indexed coordenador);
-- event OrientadorAdicionado(address indexed orientador);
+```solidity
+event EstudanteCadastrado(address indexed estudante, string matricula, string nome);
+event DisciplinaCadastrada(string indexed codigo, string nome, address coordenador);
+event PedidoRealizado(uint256 indexed idPedido, address indexed estudante, string codigoDisciplina);
+event PedidoAtualizado(uint256 indexed idPedido, StatusPedido novoStatus);
+event CoordenadorAdicionado(address indexed coordenador);
+event OrientadorAdicionado(address indexed orientador);
+```
+
+## Funcionalidades Principais
+
+### Consultas
+- `getDisciplinas()`: Retorna todas as disciplinas cadastradas
+- `getPedidosPorEstudante(address)`: Retorna pedidos de um estudante
+- `getPedidosPorDisciplina(string)`: Retorna pedidos de uma disciplina
+- `getPedidoDetalhado(uint256)`: Retorna detalhes de um pedido específico
+- `getCRIDEstudante(address)`: Retorna CRID (pedidos efetivados/trancados)
+
+### Controle de Acesso
+- **Admin**: Cadastros e gerenciamento geral
+- **Coordenador**: Processamento de pedidos de suas disciplinas
+- **Orientador**: Concordância com pedidos de orientandos
+- **Estudante**: Solicitação e trancamento de pedidos
+
+## Segurança
+
+- Controle de acesso baseado em modificadores
+- Prevenção de pedidos duplicados
+- Validação de dados de entrada
+- Controle de vagas das disciplinas
+- Auditoria através de eventos
+
+## Estrutura de Arquivos
+
+```
+├── 4_Crid_Validation.sol    # Contrato principal
+├── README.md                # Documentação
+└── LICENSE                  # Licença GPL-3.0
+```
+
+## Limitações  
+
+- Não implementa sistema de pré-requisitos
+- Não há validação de conflitos de horário
 
 ## Contribuindo
 
@@ -160,4 +217,9 @@ Este projeto está sob a licença GPL-3.0. Veja o arquivo LICENSE para mais deta
 Este projeto foi criado como parte dos estudos na Universidade Federal do Rio de Janeiro (UFRJ), no curso de Engenharia Eletrônica e de Computação, na disciplina de Programação Avançada, ministrada pelo professor Cláudio Micelli, com o objetivo de explorar projetos utilizando a tecnologia blockchain.
 
 ## Alunos
-Alan Gonçalves & Gabriela Sasso
+
+**Alan Gonçalves & Gabriela Sasso**  
+*Engenharia Eletrônica e de Computação - UFRJ*  
+*Disciplina: Programação Avançada*  
+*Professor: Cláudio Micelli*  
+*Período: 2025.1*
