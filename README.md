@@ -1,5 +1,4 @@
 # CRID - Sistema de Inscrição em Disciplinas
-[![GPL-3.0 License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](./LICENSE)
 
 Um sistema descentralizado para gerenciamento de pedidos de inscrição em disciplinas acadêmicas da UFRJ, implementado em Solidity usando blockchain Ethereum.
 
