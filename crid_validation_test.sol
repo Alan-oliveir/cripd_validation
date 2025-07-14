@@ -459,8 +459,5 @@ contract CRIDTest {
         // Verificar se vaga foi ocupada
         (,,,,,uint8 vagasOcupadas,,) = crid.disciplinas("EEL740");
         Assert.equal(vagasOcupadas, 1, "Deve haver 1 vaga ocupada");
-        
-        // Tentar efetivar outro pedido quando não há vagas
-        // (Este teste requer setup adicional para simular outro estudante)
     }
 }
