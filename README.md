@@ -1,4 +1,5 @@
 # CRID - Sistema de Inscrição em Disciplinas
+[![GPL-3.0 License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](./LICENSE)
 
 Um sistema descentralizado para gerenciamento de pedidos de inscrição em disciplinas acadêmicas da UFRJ, implementado em Solidity usando blockchain Ethereum.
 
@@ -18,7 +19,7 @@ O CRID (Sistema de Inscrição em Disciplinas) é um smart contract que digitali
 - Realização de pedidos de inscrição
 - Visualização do próprio CRID
 - Solicitação de trancamento de disciplinas
-- Controle de pedidos duplicados
+- Prevenção de pedidos duplicados
 
 ### Para Orientadores
 - Dar concordância aos pedidos dos orientandos
@@ -67,23 +68,24 @@ struct PedidoInscricao {
 
 ### Fluxo do Sistema
 
-1. **Cadastro**: Admin cadastra estudantes, coordenadores, orientadores e disciplinas
-2. **Solicitação**: Estudante realiza pedido de inscrição
-3. **Concordância**: Orientador dá concordância ao pedido
-4. **Processamento**: Coordenador aprova, rejeita ou tranca o pedido
-5. **Trancamento**: Estudante pode solicitar trancamento de disciplina efetivada
+1. **Cadastro:** Admin cadastra estudantes, coordenadores, orientadores e disciplinas
+2. **Solicitação:** Estudante realiza pedido de inscrição
+3. **Concordância:** Orientador dá concordância ao pedido
+4. **Processamento:** Coordenador aprova, rejeita ou tranca o pedido
+5. **Trancamento:** Estudante pode solicitar trancamento de disciplina efetivada
 
 ## Tecnologias Utilizadas
 
-- **Solidity**: Linguagem de programação para smart contracts
-- **Ethereum**: Blockchain para execução do contrato
-- **Remix IDE**: Ambiente de desenvolvimento
+- **Solidity:** Linguagem de programação para smart contracts
+- **Ethereum:** Blockchain para execução do contrato
+- **Remix IDE:** Ambiente de desenvolvimento
 
 ## Requisitos
 
 - Solidity `>=0.7.0 <0.9.0`
 - Ambiente Ethereum (local ou testnet)
 - Carteira Ethereum (MetaMask recomendado)
+- Saldo em ETH para deploy em testnet
 
 ## Deploy via Remix IDE
 
@@ -97,13 +99,15 @@ struct PedidoInscricao {
 
 ### 1. Configuração Inicial (Admin)
 
+Exemplo de comandos para a instância do contrato já implantada (`contract`):
+
 ```solidity
 // Adicionar coordenadores
 contract.adicionarCoordenador("0x...");
 
 // Adicionar orientadores  
 contract.adicionarOrientador("0x...");
-  
+
 // Cadastrar estudantes
 contract.cadastrarEstudante(
     "0x...",      // endereço
@@ -114,11 +118,11 @@ contract.cadastrarEstudante(
     6,            // período
     "0x..."       // orientador
 );
-  
+
 // Cadastrar disciplinas
 contract.cadastrarDisciplina(
     "EEL740",           // código
-    "COMUNICAÇÕES II",  // nome
+    "COMUNICACOES II",  // nome (sem acento por compatibilidade)
     "EL1",              // turma
     60,                 // carga horária
     30,                 // vagas
@@ -174,10 +178,10 @@ event OrientadorAdicionado(address indexed orientador);
 - `getCRIDEstudante(address)`: Retorna CRID (pedidos efetivados/trancados)
 
 ### Controle de Acesso
-- **Admin**: Cadastros e gerenciamento geral
-- **Coordenador**: Processamento de pedidos de suas disciplinas
-- **Orientador**: Concordância com pedidos de orientandos
-- **Estudante**: Solicitação e trancamento de pedidos
+- **Admin:** Cadastros e gerenciamento geral
+- **Coordenador:** Processamento de pedidos de suas disciplinas
+- **Orientador:** Concordância com pedidos de orientandos
+- **Estudante:** Solicitação e trancamento de pedidos
 
 ## Segurança
 
@@ -187,15 +191,25 @@ event OrientadorAdicionado(address indexed orientador);
 - Controle de vagas das disciplinas
 - Auditoria através de eventos
 
+## Testes
+
+O projeto inclui um arquivo de testes unitários Solidity (`crid_validation_test.sol`).
+
+Para rodar os testes no Remix:
+1. Coloque `Crid_Validation.sol` e `crid_validation_test.sol` na mesma pasta do Remix IDE.
+2. Compile ambos os arquivos.
+3. Acesse a aba "Solidity Unit Testing" no Remix e execute os testes.
+
 ## Estrutura de Arquivos
 
 ```
-├── 4_Crid_Validation.sol    # Contrato principal
-├── README.md                # Documentação
-└── LICENSE                  # Licença GPL-3.0
+├── Crid_Validation.sol            # Contrato principal
+├── crid_validation_test.sol       # Testes unitários Solidity
+├── README.md                      # Documentação
+└── LICENSE                        # Licença GPL-3.0
 ```
 
-## Limitações  
+## Limitações
 
 - Não implementa sistema de pré-requisitos
 - Não há validação de conflitos de horário
@@ -210,7 +224,7 @@ event OrientadorAdicionado(address indexed orientador);
 
 ## Licença
 
-Este projeto está sob a licença GPL-3.0. Veja o arquivo LICENSE para mais detalhes.
+Este projeto está sob a licença GPL-3.0. Veja o arquivo [LICENSE](./LICENSE) para mais detalhes.
 
 ## Agradecimentos
 
